@@ -18,10 +18,6 @@ function getNextDate() {
   return `${MONTHS[now.getMonth()]}_${now.getFullYear().toString().substring(2)}`;
 }
 
-function getlangPlural(langs) {
-  return langs.split(',').length > 1 ? 's' : '';
-}
-
 function formatDate(dateObj) {
   if (typeof dateObj === 'string') return dateObj;
   return Utilities.formatDate(dateObj, "GMT+1", "dd/MM/yyyy");
@@ -45,61 +41,6 @@ function cestOrCet(dateObj) {
   return 'Horario de España';
 }
 
-function getAdditionaInfo(item) {
-  const ADDITIONAL_INFO = [
-    {
-      index: 14,
-      label: 'Experto',
-      message: 'Se requieren conocimientos previos de sistema y ambientación.'
-    },
-    {
-      index: 15,
-      label: 'Trasfondo',
-      message: 'Contacta con el organizador a través de Discord antes de la partida.'
-    },
-    {
-      index: 16,
-      label: 'Mecánicas',
-      message: 'Hay cambios sustanciales en las mecánicas de juego.'
-    },
-    {
-      index: 17,
-      label: 'Múltiple',
-      message: 'Esta partida se juega en varias sesiones. Atento al título y a la descripción.'
-    },
-    {
-      index: 18,
-      label: 'Campaña',
-      message: 'Esta partida forma parte de una campaña. Atento al icono del título y a la descripción.'
-    },
-    {
-      index: 19,
-      label: 'Grabación',
-      message: 'La partida se grabará.'
-    },
-    {
-      index: 20,
-      label: 'Emisión',
-      message: 'La partida se emitirá.'
-    }
-  ];
-
-  const result = [];
-  ADDITIONAL_INFO.forEach(info => {
-    if (item[info.index]) {
-      result.push(info.message);
-    }
-  })
-  return result;
-}
-
-function onOpen(e) {
-  SpreadsheetApp.getUi()
-      .createMenu('Exportar partidas')
-      .addItem('Google DOC', 'createDoc')
-      .addToUi();
-}
-
 function createDoc() {
   const VERSION = '1.2.0';
   const SPREADSHEET_RANGE = 'A:U';
@@ -117,13 +58,11 @@ function createDoc() {
       return item.join('') !== '';
     });
 
-  // Remove red warning
-  if (content[content.length - 1].join('').includes('loguitos')) {
-    content.pop();
-  }
+  // // Remove red warning
+  // if (content[content.length - 1].join('').includes('loguitos')) {
+  //   content.pop();
+  // }
   
-  const columns = content[0].length;
-  const header = [...content[0]];
   content.shift();
   const docTitle = `RL_${getNextDate()}`;
 
@@ -142,19 +81,8 @@ function createDoc() {
       body.appendParagraph(title).setBold(true);
     }
 
-    const aditionaInfo = getAdditionaInfo(item);
-
     body.appendParagraph('').setBold(false);
     body.appendParagraph(`<strong>Sinopsis</strong>: ${item[13]}`);
-
-    // Consideraciones adicionales
-    if (aditionaInfo.length) {
-      body.appendParagraph('');
-      body.appendParagraph(`<strong>Importante</strong>:`);
-    }
-    aditionaInfo.forEach(info => {
-      body.appendParagraph(info);  
-    });
     
     body.appendParagraph('');
     body.appendParagraph(`<strong>Ambientación</strong>: ${item[7]}`);
@@ -163,10 +91,10 @@ function createDoc() {
     body.appendParagraph(`<strong>Sistema de juego</strong>: ${item[8]}`);
 
     body.appendParagraph('');
-    body.appendParagraph(`<strong>Jugadores</strong>: mínimo ${item[9]}, máximo ${item[10]}`);
+    body.appendParagraph(`<strong>Jugador@s</strong>: mínimo ${item[9]}, máximo ${item[10]}`);
 
     body.appendParagraph('');
-    body.appendParagraph(`<strong>Idioma${getlangPlural(item[11])}</strong>: ${item[11]}`);
+    body.appendParagraph(`<strong>Idioma/s</strong>: ${item[11]}`);
 
     body.appendParagraph('');
     body.appendParagraph(`<strong>Aviso de contenido</strong>: ${item[12]}`);
@@ -174,13 +102,53 @@ function createDoc() {
     body.appendParagraph('');
     body.appendParagraph(gameDate);
 
+    if (item[14]) {
+      body.appendParagraph('');
+      body.appendParagraph(`<strong>Experto</strong>: Se requieren conocimientos previos de sistema y ambientación.`);
+    }
+
+    if (item[15]) {
+      body.appendParagraph('');
+      body.appendParagraph(`<strong>Trasfondo</strong>: Contacta con el organizador a través de Discord antes de la partida.`);
+    }
+
+    if (item[16]) {
+      body.appendParagraph('');
+      body.appendParagraph(`<strong>Mecánicas</strong>: Hay cambios sustanciales en las mecánicas de juego.`);
+    }
+
+    if (item[17]) {
+      body.appendParagraph('');
+      body.appendParagraph(`<strong>Múltiple</strong>: Esta partida se juega en varias sesiones. Atento al título y a la descripción.`);
+    }
+
+    if (item[18]) {
+      body.appendParagraph('');
+      body.appendParagraph(`<strong>Campaña</strong>: Esta partida forma parte de una campaña. Atento al icono del título y a la descripción.`);
+    }
+
+    if (item[19]) {
+      body.appendParagraph('');
+      body.appendParagraph(`<strong>Grabación</strong>: La partida se grabará.`);
+    }
+
+    if (item[20]) {
+      body.appendParagraph('');
+      body.appendParagraph(`<strong>Emisión</strong>: La partida se emitirá.`);
+    }
+    
     body.appendParagraph('');
     body.appendParagraph(`${item[4]} (Discord: ${item[5]})`);
 
     body.appendPageBreak();
-    
   }
 }
 
+function onOpen(e) {
+  SpreadsheetApp.getUi()
+      .createMenu('Exportar partidas')
+      .addItem('Google DOC', 'createDoc')
+      .addToUi();
+}
 
 
