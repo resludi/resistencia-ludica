@@ -16,3 +16,4 @@ El Google Document que se genera se utiliza para introducir las partidas al sist
 1. En el Google Spreadsheet the `Programación partidas` deberia haber un menú con el título `Extensiones`.
 2. Seleccionar la opción `Apps Script`.
 3. El editor de scripts se debería abrir sin problemas.
+4. Actualizar el repositorio con las modificaciones aplicadas. 
