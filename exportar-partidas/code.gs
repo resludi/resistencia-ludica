@@ -20,25 +20,27 @@ function getNextDate() {
 
 function formatDate(dateObj) {
   if (typeof dateObj === 'string') return dateObj;
-  return Utilities.formatDate(dateObj, "GMT+1", "dd/MM/yyyy");
+  return dateObj.toLocaleDateString(
+    'es-ES', 
+    {timeZone: 'Europe/Madrid', day: '2-digit', month: '2-digit', year: 'numeric'}
+  )
 }
 
 function formatTime(dateObj) {
   if (typeof dateObj === 'string') return dateObj.replaceAll(' ','');
-  return dateObj.toLocaleTimeString('en',
-    {timeZone:'Europe/Madrid',hour12:true,hour:'numeric',minute:'numeric'}
+  return dateObj.toLocaleTimeString(
+    'es-ES',
+    {timeZone:'Europe/Madrid', hour12: false, hour: '2-digit', minute: '2-digit'}
   );
 }
 
 function cestOrCet(dateObj) {
-  /*
-  if (typeof dateObj === 'string') return '--';
-  const correctDateStr = Utilities.formatDate(dateObj, "GMT+1", "dd-MM-yyyy");
-  const correctDate = new Date(correctDateStr)
-  console.log(correctDate.getTimezoneOffset())
-  return dateObj.getTimezoneOffset() === -60 ? 'CET' : 'CEST';
-  */
-  return 'Horario de España';
+  dateStr = dateObj.toLocaleString(
+    'es-ES',
+    {timeZone: 'Europe/Madrid', timeZoneName: "short"}
+  )
+  // FIXME: esto es una chapuza para sacar el timezone del string
+  return dateStr.split(' ')[2];
 }
 
 function createDoc() {
@@ -57,11 +59,6 @@ function createDoc() {
     .filter(item => {
       return item.join('') !== '';
     });
-
-  // // Remove red warning
-  // if (content[content.length - 1].join('').includes('loguitos')) {
-  //   content.pop();
-  // }
   
   content.shift();
   const docTitle = `RL_${getNextDate()}`;
