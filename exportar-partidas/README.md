@@ -10,6 +10,7 @@ El Google Document que se genera se utiliza para introducir las partidas al sist
 2. Seleccionar la opción `Google DOC` del menú. 
 3. Una vez el script haya finalizado su ejecución, el Google Document generado debería estar en tu unidad de Google Drive.
 4. El nombre del fichero tiene el formato `RL_{Mes}_{Año}`
+5. Copiar el fichero en el Drive de RL.
 
 ## Cómo modificar el script?
 
