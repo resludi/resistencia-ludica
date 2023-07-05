@@ -1,18 +1,19 @@
+const MONTHS = [
+  'enero',
+  'febrero',
+  'marzo',
+  'abril',
+  'mayo',
+  'junio',
+  'julio',
+  'agosto',
+  'septiembre',
+  'octubre',
+  'noviembre',
+  'diciembre',
+];
+
 function getNextDate() {
-  const MONTHS = [
-    'Enero',
-    'Febrero',
-    'Marzo',
-    'Abril',
-    'Mayo',
-    'Junio',
-    'Julio',
-    'Agosto',
-    'Septiembre',
-    'Octubre',
-    'Noviembre',
-    'Diciembre',
-  ];
   const now = new Date();
   now.setMonth(now.getMonth() + 1);
   return `${MONTHS[now.getMonth()]}_${now.getFullYear().toString().substring(2)}`;
@@ -43,6 +44,15 @@ function cestOrCet(dateObj) {
   return dateStr.split(' ')[2];
 }
 
+function getGamePublishDate(dateObj) {
+  // Queremos el 1r lunes con una semana completa por medio
+  const date = new Date(dateObj);
+  const day = date.getDay();
+  const diff = date.getDate() - day + (day === 0 ? +1 : 1) - 7;
+
+  return new Date(date.setDate(diff));
+}
+
 function createDoc() {
   const VERSION = '1.2.0';
   const SPREADSHEET_RANGE = 'A:U';
@@ -66,9 +76,13 @@ function createDoc() {
   const doc = DocumentApp.create(docTitle);
   var body = doc.getBody();
   
-  for (let i=0; i<content.length; i++) {
+  for (let i=1; i<content.length; i++) {
     const item = content[i];
     const title = `${item[6]} (${item[8]})`;
+    const eventDate = formatDate(item[0]);
+    const eventStartTime = formatTime(item[2]);
+    const eventEndTime = formatTime(item[3]);
+    const eventTz = cestOrCet(item[0]);
     
     if (i === 0) {
       body.getChild(0).asParagraph().setText(title);
@@ -84,7 +98,7 @@ function createDoc() {
     body.appendParagraph(`<strong>Plazas</strong>: mínimo ${item[9]}, máximo ${item[10]}`);
     body.appendParagraph(`<strong>Idioma/s</strong>: ${item[11]}`);
     body.appendParagraph(`<strong>Aviso de contenido</strong>: ${item[12]}`);
-    body.appendParagraph(`<strong>Día</strong>: ${item[1]} ${formatDate(item[0])} de ${formatTime(item[2])} a ${formatTime(item[3])} (${cestOrCet(item[0])})`);
+    body.appendParagraph(`<strong>Día</strong>: ${item[1]} ${eventDate} de ${eventStartTime} a ${eventEndTime} (${eventTz})`);
 
     if (item[14]) {
       body.appendParagraph(`<strong>Experto</strong>: Se requieren conocimientos previos de sistema y ambientación.`);
@@ -114,6 +128,12 @@ function createDoc() {
       body.appendParagraph(`<strong>Emisión</strong>: La partida se emitirá.`);
     }
     
+    // const currentMonth = new Date(item[0]).getMonth();
+    const publishDate = getGamePublishDate(item[0])
+    body.appendParagraph(
+      `¡Atención! Las inscripciones para esta partida se abrirán el próximo lunes ${publishDate.getDate()} de ${MONTHS[publishDate.getMonth()]} a las 22:00 (${eventTz}).`
+    );
+    body.appendParagraph('');
     body.appendParagraph(`${item[4]} (Discord: ${item[5]})`);
     body.appendPageBreak();
   }
